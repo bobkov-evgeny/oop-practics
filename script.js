@@ -220,7 +220,7 @@ Test data:
 §
 Data car 1: 'Tesla' going at 120 km/h, with a charge of 23%
 */
-
+/*
 class Person {
    constructor(fullName, birthYear) {
       this.fullName = fullName;
@@ -264,4 +264,173 @@ class Student extends Person {
 }
 
 const martha = new Student('Martha Jones', 1992, 'Computer Science');
-martha.introduce();
+//martha.introduce();
+
+///////////////////////////////////////////////////////////////////////
+
+const PersonProto = {
+   calcAge() {
+      console.log(2037 - this.birthYear);
+   },
+
+   init(firstName, birthYear) {
+      this.firstName = firstName;
+      this.birthYear = birthYear;
+   },
+};
+
+const steven = Object.create(PersonProto);
+
+const StudentProto = Object.create(PersonProto);
+const jay = Object.create(StudentProto);
+
+StudentProto.init = function (firstName, birthYear, cource) {
+   PersonProto.init.call(this, firstName, birthYear);
+   this.cource = cource;
+};
+
+StudentProto.introduce = function () {
+   console.log(`${this.firstName} is stydying ${this.cource}`);
+};
+
+//jay.init('Jay', 1996, 'programming');
+//console.log(jay);
+//jay.calcAge();
+//jay.introduce();
+
+////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+
+// 1) Public fields
+// 2) Private fields
+// 3) Public methods
+// 4) Private methods
+// (there is also the static version)
+
+class Account {
+   // 1) Public fields defined (instances)
+   locale = navigator.language;
+
+   // 2) Private fields (inctances, not prototypes)
+   #movements = [];
+   #pin;
+
+   constructor(owner, currency, pinCode) {
+      this.owner = owner;
+      this.currency = currency;
+      // protected property
+      //this._movements = [];
+      this.#pin = pinCode;
+      //this.locale = navigator.language;
+
+      console.log(`Thanks for opening an account, ${owner}`);
+   }
+
+   // 3) Public methods
+   // Public interface
+   getMovements() {
+      return this.#movements;
+   }
+
+   deposit(value) {
+      this.#movements.push(value);
+   }
+
+   withdraw(value) {
+      this.deposit(-value);
+   }
+
+   requestLoan(value) {
+      if (this._approveLoan(value)) {
+         this.deposit(value);
+         console.log('Loan approved');
+      }
+   }
+
+   static helper() {
+      console.log('Helper');
+   }
+
+   // ------- Private methods -----------
+   //#approveLoan(value) {
+   _approveLoan(value) {
+      return true;
+   }
+}
+
+const acc1 = new Account('Jonas', 'EUR', 1111);
+
+// Bad practics
+//acc1.movements.push(250);
+//acc1.movements.push(-140);
+
+// Good practics
+acc1.deposit(500);
+acc1.withdraw(300);
+acc1.requestLoan(1000);
+
+console.log(acc1.getMovements());
+// console.log(acc1.#movements);
+Account.helper();
+
+*/
+
+class CarClass {
+   constructor(make, speed) {
+      this.make = make;
+      this.speed = speed;
+   }
+
+   accelerate() {
+      this.speed += 10;
+      console.log(this.speed);
+   }
+
+   brake() {
+      this.speed -= 5;
+      console.log(this.speed);
+      return this;
+   }
+
+   get speedUS() {
+      console.log(this.speed / 1.6);
+   }
+
+   set speedUS(speed) {
+      this.speed = speed * 1.6;
+   }
+}
+
+class ElectricCar extends CarClass {
+   #charge;
+   constructor(make, speed, charge) {
+      super(make, speed);
+      this.#charge = charge;
+   }
+
+   chargeBattery(value) {
+      this.#charge += value;
+      return this;
+   }
+
+   accelerate() {
+      this.speed += 20;
+      this.#charge -= 1;
+      console.log(`The speed is ${this.speed} and charge is ${this.#charge}%.`);
+      return this;
+   }
+}
+
+const tesla = new ElectricCar('Tesla', 120, 23);
+console.log(tesla);
+tesla
+   .accelerate()
+   .accelerate()
+   .accelerate()
+   .brake()
+   .brake()
+   .brake()
+   .accelerate()
+   .chargeBattery(20)
+   .accelerate()
+   .accelerate();
